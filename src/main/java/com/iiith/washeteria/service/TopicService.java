@@ -19,6 +19,7 @@ public class TopicService {
 
 	public Topic getTopic(String id) {
 		// TODO Auto-generated method stub
+		
 		return topicDAO.getById(id);
 	}
 
