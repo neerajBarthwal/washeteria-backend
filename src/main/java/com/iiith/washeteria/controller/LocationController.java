@@ -18,7 +18,9 @@ public class LocationController {
 	private LocationService locationService;
 	
 	
-	@RequestMapping(value="/locations",method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value="/locations",
+					method = RequestMethod.GET, 
+					produces = MediaType.APPLICATION_JSON_VALUE)
 	public List<LocationBE> getLocations(){
 		
 		return locationService.getLocations();

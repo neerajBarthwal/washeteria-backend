@@ -29,6 +29,12 @@ public class Event {
 	
 	@Column
 	private String userId;
+	
+	@Column
+	private Date modifiedTime;
+	
+	@Column
+	private boolean isCancelled;
 
 	public String getEventId() {
 		return eventId;
@@ -77,6 +83,21 @@ public class Event {
 	public void setUserId(String userId) {
 		this.userId = userId;
 	}
-	
+
+	public Date getModifiedTime() {
+		return modifiedTime;
+	}
+
+	public void setModifiedTime(Date modifiedTime) {
+		this.modifiedTime = modifiedTime;
+	}
+
+	public boolean isCancelled() {
+		return isCancelled;
+	}
+
+	public void setCancelled(boolean isCancelled) {
+		this.isCancelled = isCancelled;
+	}
 	
 }

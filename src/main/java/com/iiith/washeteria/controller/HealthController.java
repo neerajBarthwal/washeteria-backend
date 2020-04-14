@@ -8,7 +8,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class HealthController {
 	
-	@RequestMapping(value="/health",method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value="/health",
+					method = RequestMethod.GET, 
+					produces = MediaType.APPLICATION_JSON_VALUE)
 	public boolean healthCheck() {
 		return true;
 	}

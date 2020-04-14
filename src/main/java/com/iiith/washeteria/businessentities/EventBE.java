@@ -3,11 +3,13 @@ package com.iiith.washeteria.businessentities;
 public class EventBE {
 
 	private String eventId;
-	private long startTime;
-	private long endTime;
+	private long startsAt;
+	private long endsAt;
+	private long modifiedAt;
 	private String machineId;
 	private String locationId;
 	private String userId;
+	private boolean isCancelled;
 
 	public String getEventId() {
 		return eventId;
@@ -15,17 +17,24 @@ public class EventBE {
 	public void setEventId(String eventId) {
 		this.eventId = eventId;
 	}
-	public long getStartTime() {
-		return startTime;
+	
+	public long getStartsAt() {
+		return startsAt;
 	}
-	public void setStartTime(long startTime) {
-		this.startTime = startTime;
+	public void setStartsAt(long startsAt) {
+		this.startsAt = startsAt;
 	}
-	public long getEndTime() {
-		return endTime;
+	public long getEndsAt() {
+		return endsAt;
 	}
-	public void setEndTime(long endTime) {
-		this.endTime = endTime;
+	public void setEndsAt(long endsAt) {
+		this.endsAt = endsAt;
+	}
+	public long getModifiedAt() {
+		return modifiedAt;
+	}
+	public void setModifiedAt(long modifiedAt) {
+		this.modifiedAt = modifiedAt;
 	}
 	public String getMachineId() {
 		return machineId;
@@ -45,6 +54,12 @@ public class EventBE {
 	public void setUserId(String userId) {
 		this.userId = userId;
 	}
-
+	public boolean isCancelled() {
+		return isCancelled;
+	}
+	public void setCancelled(boolean isCancelled) {
+		this.isCancelled = isCancelled;
+	}
+	
 
 }

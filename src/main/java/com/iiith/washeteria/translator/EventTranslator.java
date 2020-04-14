@@ -19,9 +19,11 @@ public class EventTranslator {
 			eventBE.setEventId(event.getEventId());
 			eventBE.setMachineId(event.getMachineId());
 			eventBE.setLocationId(event.getLocationId());
-			eventBE.setStartTime(event.getStartTime().getTime()/1000);
-			eventBE.setEndTime(event.getEndTime().getTime()/1000);
+			eventBE.setStartsAt(event.getStartTime().getTime()/1000);
+			eventBE.setEndsAt(event.getEndTime().getTime()/1000);
 			eventBE.setUserId(event.getUserId());
+			eventBE.setModifiedAt(event.getModifiedTime().getTime()/1000);
+			eventBE.setCancelled(event.isCancelled());
 		}
 		return eventBE;
 	}
@@ -48,16 +50,22 @@ public class EventTranslator {
 			event.setEventId(eventBE.getEventId());
 			event.setMachineId(eventBE.getMachineId());
 			event.setLocationId(eventBE.getLocationId());
-			if(eventBE.getStartTime()!=0) {
-				Date startTime = new Date(eventBE.getStartTime()*1000);
+			
+			if(eventBE.getStartsAt()!=0) {
+				Date startTime = new Date(eventBE.getStartsAt()*1000);
 				event.setStartTime(startTime);
 			}
-			if(eventBE.getEndTime()!=0) {
-				Date endTime = new Date(eventBE.getEndTime()*1000);
+			if(eventBE.getEndsAt()!=0) {
+				Date endTime = new Date(eventBE.getEndsAt()*1000);
 				event.setEndTime(endTime);
 
 			}
+			if(eventBE.getModifiedAt()==0)
+				event.setModifiedTime(new Date());
+			else
+				event.setModifiedTime(new Date(eventBE.getModifiedAt()*1000));
 			event.setUserId(eventBE.getUserId());
+			event.setCancelled(eventBE.isCancelled());
 		}
 		return event;
 	}

@@ -1,4 +1,4 @@
-package com.iiith.washeteria.businessentities;
+package com.iiith.washeteria.security;
 
 public class UserClaims {
 

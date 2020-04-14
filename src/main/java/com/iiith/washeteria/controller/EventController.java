@@ -20,30 +20,39 @@ public class EventController {
 	private EventService eventService;
 
 	@RequestMapping(value = "/events/{eventId}",
-			method = RequestMethod.GET,
-			produces = MediaType.APPLICATION_JSON_VALUE)
+					method = RequestMethod.GET,
+					produces = MediaType.APPLICATION_JSON_VALUE)
 	public EventBE getEvent(@PathVariable("eventId") String eventId) {
 		return eventService.getEvent(eventId);
 	}
 
 	@RequestMapping(value = "/events",
-			method = RequestMethod.POST,
-			consumes = MediaType.APPLICATION_JSON_VALUE,
-			produces = MediaType.APPLICATION_JSON_VALUE)
+					method = RequestMethod.POST,
+					consumes = MediaType.APPLICATION_JSON_VALUE,
+					produces = MediaType.APPLICATION_JSON_VALUE)
 	public void addEvents(@RequestBody List<EventBE> events) {
 		eventService.addEvents(events);
 	}
 
 	@RequestMapping(value = "/events",
-			method = RequestMethod.PUT,
-			consumes = MediaType.APPLICATION_JSON_VALUE)
+					method = RequestMethod.PUT,
+					consumes = MediaType.APPLICATION_JSON_VALUE)
 	public void updateEvent(@RequestBody EventBE event) {
 		eventService.updateEvent(event);
 	}
 
 	@RequestMapping(value = "/events/{eventId}",
-			method = RequestMethod.DELETE)
+					method = RequestMethod.DELETE)
 	public void deleteEvent(@PathVariable("eventId") String eventId) {
 		eventService.deleteEvent(eventId);
 	}
+	
+	@RequestMapping(value = "events/modified/{modifiedTime}",
+					method = RequestMethod.GET,
+					produces = MediaType.APPLICATION_JSON_VALUE)
+	public List<EventBE> getModifiedEvents(@PathVariable long modifiedTime) {
+		return eventService.getModifiedEvents(modifiedTime);
+	}
+	
+	
 }

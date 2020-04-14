@@ -8,7 +8,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.springframework.stereotype.Service;
 
-import com.iiith.washeteria.businessentities.UserClaims;
+import com.iiith.washeteria.security.UserClaims;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;

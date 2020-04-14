@@ -10,5 +10,6 @@ public interface EventService {
 	public void addEvents(List<EventBE> events);
 	public void updateEvent(EventBE event);
 	public void deleteEvent(String eventId);
+	public List<EventBE> getModifiedEvents(long modifiedTime);
 	
 }

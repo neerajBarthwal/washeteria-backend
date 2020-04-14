@@ -1,5 +1,6 @@
 package com.iiith.washeteria.serviceImpl;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,6 +59,17 @@ public class EventServiceImpl implements EventService {
 			eventDAO.deleteById(eventId);
 		}
 		
+	}
+
+	@Override
+	public List<EventBE> getModifiedEvents(long modifiedTime) {
+		List<EventBE> eventBEs = null;
+		if(modifiedTime>0) {
+			Date modifiedAt = new Date(modifiedTime*1000);
+			List<Event>  events = eventDAO.findByModifiedTimeGreaterThanEqualOrderByModifiedTime(modifiedAt);
+			eventBEs = translate.toBE(events);
+		}
+		return eventBEs;
 	}
 
 }
