@@ -1,9 +1,11 @@
 package com.iiith.washeteria.dataentities;
 
-import java.util.Date;
+import java.time.Instant;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
@@ -12,26 +14,27 @@ import javax.persistence.Table;
 public class Machine {
 	
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column
-	private String machineId;
+	private long machineId;
 	
 	@Column
 	private String machineName;
 	
 	@Column
-	private String locationId;
+	private long locationId;
 	
 	@Column
 	private String status;
 	
 	@Column
-	private Date remainingTime;
+	private Instant availableAt;
 
-	public String getMachineId() {
+	public long getMachineId() {
 		return machineId;
 	}
 
-	public void setMachineId(String machineId) {
+	public void setMachineId(long machineId) {
 		this.machineId = machineId;
 	}
 
@@ -43,11 +46,11 @@ public class Machine {
 		this.machineName = machineName;
 	}
 
-	public String getLocationId() {
+	public long getLocationId() {
 		return locationId;
 	}
 
-	public void setLocationId(String locationId) {
+	public void setLocationId(long locationId) {
 		this.locationId = locationId;
 	}
 
@@ -59,12 +62,12 @@ public class Machine {
 		this.status = status;
 	}
 
-	public Date getRemainingTime() {
-		return remainingTime;
+	public Instant getAvailableAt() {
+		return availableAt;
 	}
 
-	public void setRemainingTime(Date remainingTime) {
-		this.remainingTime = remainingTime;
+	public void setAvailableAt(Instant availableAt) {
+		this.availableAt = availableAt;
 	}
-	
+
 }

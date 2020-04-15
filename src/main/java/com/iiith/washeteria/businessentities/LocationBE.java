@@ -2,16 +2,16 @@ package com.iiith.washeteria.businessentities;
 
 public class LocationBE {
 	
-	private String id;
+	private long id;
 	private String name;
 	
 	public LocationBE() {
 	}
 	
-	public String getId() {
+	public long getId() {
 		return id;
 	}
-	public void setId(String id) {
+	public void setId(long id) {
 		this.id = id;
 	}
 	public String getName() {
@@ -20,7 +20,5 @@ public class LocationBE {
 	public void setName(String name) {
 		this.name = name;
 	}
-	
-	
 	
 }

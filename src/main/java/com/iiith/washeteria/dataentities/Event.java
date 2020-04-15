@@ -1,9 +1,11 @@
 package com.iiith.washeteria.dataentities;
 
-import java.util.Date;
+import java.time.Instant;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
@@ -12,67 +14,69 @@ import javax.persistence.Table;
 public class Event {
 
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column
-	private String eventId;
+	private long eventId;
 	
 	@Column
-	private Date startTime;
+	private Instant startTime;
 	
 	@Column
-	private Date endTime;
+	private Instant endTime;
 	
 	@Column
-	private String locationId;
+	private long locationId;
 	
 	@Column
-	private String machineId;
+	private long machineId;
 	
 	@Column
 	private String userId;
 	
 	@Column
-	private Date modifiedTime;
+	private Instant modifiedTime;
 	
 	@Column
 	private boolean isCancelled;
 
-	public String getEventId() {
+	
+	public long getEventId() {
 		return eventId;
 	}
 
-	public void setEventId(String eventId) {
+	public void setEventId(long eventId) {
 		this.eventId = eventId;
 	}
 
-	public Date getStartTime() {
+	public Instant getStartTime() {
 		return startTime;
 	}
 
-	public void setStartTime(Date startTime) {
+	public void setStartTime(Instant startTime) {
 		this.startTime = startTime;
 	}
 
-	public Date getEndTime() {
+	public Instant getEndTime() {
 		return endTime;
 	}
 
-	public void setEndTime(Date endTime) {
+	public void setEndTime(Instant endTime) {
 		this.endTime = endTime;
 	}
 
-	public String getLocationId() {
+	public long getLocationId() {
 		return locationId;
 	}
 
-	public void setLocationId(String locationId) {
+	public void setLocationId(long locationId) {
 		this.locationId = locationId;
 	}
 
-	public String getMachineId() {
+	public long getMachineId() {
 		return machineId;
 	}
 
-	public void setMachineId(String machineId) {
+	public void setMachineId(long machineId) {
 		this.machineId = machineId;
 	}
 
@@ -84,11 +88,11 @@ public class Event {
 		this.userId = userId;
 	}
 
-	public Date getModifiedTime() {
+	public Instant getModifiedTime() {
 		return modifiedTime;
 	}
 
-	public void setModifiedTime(Date modifiedTime) {
+	public void setModifiedTime(Instant modifiedTime) {
 		this.modifiedTime = modifiedTime;
 	}
 

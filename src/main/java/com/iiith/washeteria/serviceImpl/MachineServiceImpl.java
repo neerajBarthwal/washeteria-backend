@@ -1,5 +1,6 @@
 package com.iiith.washeteria.serviceImpl;
 
+import java.time.Instant;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,10 +30,10 @@ public class MachineServiceImpl implements MachineService {
 	}
 	
 	@Override
-	public MachineBE getMachine(String machineId) {
+	public MachineBE getMachine(long machineId) {
 		Machine machine = null;
 		
-		if(machineId!=null && machineId!="") {
+		if(machineId>0) {
 			machine = machineDAO.getOne(machineId);
 		}
 		MachineBE machineBE = translate.toBE(machine);
@@ -40,7 +41,7 @@ public class MachineServiceImpl implements MachineService {
 	}
 
 	@Override
-	public List<MachineBE> getMachinesAt(String location) {
+	public List<MachineBE> getMachinesAt(long location) {
 		
 		List<Machine> machines = machineDAO.findByLocationId(location);
 		List<MachineBE> machineBEs = translate.toBE(machines);
@@ -59,6 +60,11 @@ public class MachineServiceImpl implements MachineService {
 
 	}
 
+	@Override
+	public void updateMachineAvailability(long machineId, Instant availableAt) {
+		Machine machine = machineDAO.getOne(machineId);
+		machine.setAvailableAt(availableAt);
+		machineDAO.save(machine);
+	}
 	
-
 }

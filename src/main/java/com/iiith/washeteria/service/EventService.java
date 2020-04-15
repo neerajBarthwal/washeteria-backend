@@ -6,10 +6,11 @@ import com.iiith.washeteria.businessentities.EventBE;
 
 public interface EventService {
 	
-	public EventBE getEvent(String eventId);
-	public void addEvents(List<EventBE> events);
+	public EventBE getEvent(long eventId);
+	public void addEvents(EventBE event);
 	public void updateEvent(EventBE event);
-	public void deleteEvent(String eventId);
+	public void deleteEvent(long eventId);
 	public List<EventBE> getModifiedEvents(long modifiedTime);
+	public List<EventBE> getEvents();
 	
 }

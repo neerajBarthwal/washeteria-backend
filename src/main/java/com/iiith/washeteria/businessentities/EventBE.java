@@ -2,22 +2,21 @@ package com.iiith.washeteria.businessentities;
 
 public class EventBE {
 
-	private String eventId;
+	private long eventId;
 	private long startsAt;
 	private long endsAt;
 	private long modifiedAt;
-	private String machineId;
-	private String locationId;
+	private long machineId;
+	private long locationId;
 	private String userId;
 	private boolean isCancelled;
 
-	public String getEventId() {
+	public long getEventId() {
 		return eventId;
 	}
-	public void setEventId(String eventId) {
+	public void setEventId(long eventId) {
 		this.eventId = eventId;
 	}
-	
 	public long getStartsAt() {
 		return startsAt;
 	}
@@ -36,16 +35,17 @@ public class EventBE {
 	public void setModifiedAt(long modifiedAt) {
 		this.modifiedAt = modifiedAt;
 	}
-	public String getMachineId() {
+	
+	public long getMachineId() {
 		return machineId;
 	}
-	public void setMachineId(String machineId) {
+	public void setMachineId(long machineId) {
 		this.machineId = machineId;
 	}
-	public String getLocationId() {
+	public long getLocationId() {
 		return locationId;
 	}
-	public void setLocationId(String locationId) {
+	public void setLocationId(long locationId) {
 		this.locationId = locationId;
 	}
 	public String getUserId() {

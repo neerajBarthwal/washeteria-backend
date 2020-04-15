@@ -2,16 +2,16 @@ package com.iiith.washeteria.businessentities;
 
 public class MachineBE {
 	
-	private String id;
+	private long id;
 	private String name;
-	private String locationId;
+	private long locationId;
 	private String status;
-	private long remainingTime;
+	private long nextAvaiableAt;
 	
-	public String getId() {
+	public long getId() {
 		return id;
 	}
-	public void setId(String id) {
+	public void setId(long id) {
 		this.id = id;
 	}
 	public String getName() {
@@ -20,10 +20,10 @@ public class MachineBE {
 	public void setName(String name) {
 		this.name = name;
 	}
-	public String getLocationId() {
+	public long getLocationId() {
 		return locationId;
 	}
-	public void setLocationId(String locationId) {
+	public void setLocationId(long locationId) {
 		this.locationId = locationId;
 	}
 	public String getStatus() {
@@ -32,12 +32,11 @@ public class MachineBE {
 	public void setStatus(String status) {
 		this.status = status;
 	}
-	public long getRemainingTime() {
-		return remainingTime;
+	public long getNextAvaiableAt() {
+		return nextAvaiableAt;
 	}
-	
-	public void setRemainingTime(long remainingTime) {
-		this.remainingTime = remainingTime;
+	public void setNextAvaiableAt(long nextAvaiableAt) {
+		this.nextAvaiableAt = nextAvaiableAt;
 	}
 	
 }

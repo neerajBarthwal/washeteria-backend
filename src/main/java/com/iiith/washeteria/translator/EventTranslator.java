@@ -1,7 +1,7 @@
 package com.iiith.washeteria.translator;
 
+import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
@@ -13,16 +13,17 @@ import com.iiith.washeteria.dataentities.Event;
 public class EventTranslator {
 
 	public EventBE toBE(Event event) {
+		
 		EventBE eventBE = null;
 		if(event!=null) {
 			eventBE = new EventBE();
 			eventBE.setEventId(event.getEventId());
 			eventBE.setMachineId(event.getMachineId());
 			eventBE.setLocationId(event.getLocationId());
-			eventBE.setStartsAt(event.getStartTime().getTime()/1000);
-			eventBE.setEndsAt(event.getEndTime().getTime()/1000);
+			eventBE.setStartsAt(event.getStartTime().getEpochSecond());
+			eventBE.setEndsAt(event.getEndTime().getEpochSecond());
 			eventBE.setUserId(event.getUserId());
-			eventBE.setModifiedAt(event.getModifiedTime().getTime()/1000);
+			eventBE.setModifiedAt(event.getModifiedTime().getEpochSecond());
 			eventBE.setCancelled(event.isCancelled());
 		}
 		return eventBE;
@@ -47,23 +48,23 @@ public class EventTranslator {
 
 		if(eventBE!=null) {
 			event = new Event();
-			event.setEventId(eventBE.getEventId());
 			event.setMachineId(eventBE.getMachineId());
 			event.setLocationId(eventBE.getLocationId());
 			
 			if(eventBE.getStartsAt()!=0) {
-				Date startTime = new Date(eventBE.getStartsAt()*1000);
+				Instant startTime = Instant.ofEpochSecond(eventBE.getStartsAt());
 				event.setStartTime(startTime);
 			}
 			if(eventBE.getEndsAt()!=0) {
-				Date endTime = new Date(eventBE.getEndsAt()*1000);
+				Instant endTime = Instant.ofEpochSecond(eventBE.getEndsAt());
 				event.setEndTime(endTime);
 
 			}
 			if(eventBE.getModifiedAt()==0)
-				event.setModifiedTime(new Date());
+				event.setModifiedTime(Instant.now());
 			else
-				event.setModifiedTime(new Date(eventBE.getModifiedAt()*1000));
+				event.setModifiedTime(Instant.ofEpochSecond(eventBE.getModifiedAt()));
+			
 			event.setUserId(eventBE.getUserId());
 			event.setCancelled(eventBE.isCancelled());
 		}

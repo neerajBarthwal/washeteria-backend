@@ -33,7 +33,6 @@ public class LocationTranslator {
 		Location location = null;
 		if(locationBE!=null) {
 			location = new Location();
-			location.setLocationId(locationBE.getId());
 			location.setName(locationBE.getName());
 		}
 		return location;

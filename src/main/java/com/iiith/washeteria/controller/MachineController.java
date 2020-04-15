@@ -29,14 +29,14 @@ public class MachineController {
 	@RequestMapping(value = "/machines/{machineId}", 
 					method = RequestMethod.GET, 
 					produces = MediaType.APPLICATION_JSON_VALUE)
-	public MachineBE getMachine(@PathVariable("machineId") String machineId) {
+	public MachineBE getMachine(@PathVariable("machineId") long machineId) {
 		return machineService.getMachine(machineId);
 	}
 	
 	@RequestMapping(value = "/machines/location/{locationId}", 
 					method = RequestMethod.GET,  
 					produces = MediaType.APPLICATION_JSON_VALUE)
-	public List<MachineBE> getMachinesAt(@PathVariable("locationId") String location){
+	public List<MachineBE> getMachinesAt(@PathVariable("locationId") long location){
 		return machineService.getMachinesAt(location);
 	}
 	

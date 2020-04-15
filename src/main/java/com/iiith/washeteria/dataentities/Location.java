@@ -2,6 +2,8 @@ package com.iiith.washeteria.dataentities;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
@@ -10,17 +12,18 @@ import javax.persistence.Table;
 public class Location {
 
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column
-	private String locationId;
+	private long locationId;
 	
 	@Column
 	private String name;
 
-	public String getLocationId() {
+	public long getLocationId() {
 		return locationId;
 	}
 
-	public void setLocationId(String locationId) {
+	public void setLocationId(long locationId) {
 		this.locationId = locationId;
 	}
 
