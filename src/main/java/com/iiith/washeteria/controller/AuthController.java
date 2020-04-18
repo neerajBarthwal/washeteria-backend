@@ -6,12 +6,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class HealthController {
+public class AuthController {
 	
-	@RequestMapping(value="/health",
+	@RequestMapping(value="/auth/token",
 					method = RequestMethod.GET, 
 					produces = MediaType.APPLICATION_JSON_VALUE)
-	public boolean healthCheck() {
+	public boolean getAuthToekn() {
 		return true;
 	}
 }

@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 import com.iiith.washeteria.businessentities.EventBE;
 import com.iiith.washeteria.dao.EventDAO;
 import com.iiith.washeteria.dataentities.Event;
+import com.iiith.washeteria.exceptions.ErrorMessage;
+import com.iiith.washeteria.exceptions.ExceptionCodes;
 import com.iiith.washeteria.service.EventService;
 import com.iiith.washeteria.service.MachineService;
 import com.iiith.washeteria.translator.EventTranslator;
@@ -37,7 +39,7 @@ public class EventServiceImpl implements EventService {
 
 		Instant today = Instant.now();
 		Instant endOfweek = today.plus(Period.ofDays(7));
-		List<Event> events = eventDAO.findByStartTimeBetween(today, endOfweek);
+		List<Event> events = eventDAO.findByEndTimeBetweenOrderByStartTime(today, endOfweek);
 		if(events!=null)
 			eventBEs = translate.toBE(events);
 		return eventBEs;
@@ -55,25 +57,53 @@ public class EventServiceImpl implements EventService {
 	}
 
 	@Override
-	public void addEvents(EventBE eventBE) {
+	public EventBE addEvents(EventBE eventBE) throws ErrorMessage {
+		EventBE createdEvent = null;
+		boolean isOverlapping  = isOverlapping(eventBE);
+		if(eventBE!=null && !isOverlapping) {
+			Event event = translate.toDE(eventBE);
+			event = eventDAO.save(event);
+			Instant availableAt = getNextAvailableTime(event);
+			machineService.updateMachineAvailability(event.getMachineId(),availableAt);
+			createdEvent = translate.toBE(event);
+		}
+		return createdEvent;
+	}
 
+	private boolean isOverlapping(EventBE newEvent) throws ErrorMessage {
+		
+		Instant today = Instant.now();
+		Instant endOfweek = today.plus(Period.ofDays(7));
+		List<Event> existingEvents = eventDAO.
+									 findByMachineIdAndEndTimeBetween(newEvent.getMachineId(),today,endOfweek);
+		
+		for(Event existingEvent:existingEvents) {
+			Instant startTimeOfNewEvent = Instant.ofEpochSecond(newEvent.getStartsAt());
+			Instant endTimeOfNewEvent = Instant.ofEpochSecond(newEvent.getEndsAt());
+			
+			Instant startTime = existingEvent.getStartTime();
+			Instant endTime = existingEvent.getEndTime();
+			
+			if(startTimeOfNewEvent.isAfter(startTime) && startTimeOfNewEvent.isBefore(endTime))
+				throw new ErrorMessage(ExceptionCodes.OVERLAPPING_EVENT);
+			else if(endTimeOfNewEvent.isAfter(startTime) && endTimeOfNewEvent.isBefore(endTime))
+				throw new ErrorMessage(ExceptionCodes.OVERLAPPING_EVENT);
+		}
+		return false;
+	}
+	
+
+	@Override
+	public EventBE updateEvent(EventBE eventBE) {
+		EventBE updatedEvent = null;
 		if(eventBE!=null) {
 			Event event = translate.toDE(eventBE);
-			eventDAO.save(event);
+			event = eventDAO.save(event);
+			updatedEvent = translate.toBE(event);
 			Instant availableAt = getNextAvailableTime(event);
 			machineService.updateMachineAvailability(event.getMachineId(),availableAt);
 		}
-
-	}
-
-	@Override
-	public void updateEvent(EventBE eventBE) {
-
-		if(eventBE!=null) {
-			Event event = translate.toDE(eventBE);
-			eventDAO.save(event);
-		}
-
+		return updatedEvent;
 	}
 
 	@Override
@@ -102,11 +132,12 @@ public class EventServiceImpl implements EventService {
 		Instant now = LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant();
 		Instant endOfWeek = now.plus(Period.ofDays(7));
 
-		List<Event> events = eventDAO.findByMachineIdAndStartTimeBetween(event.getMachineId(),now,endOfWeek);
+		List<Event> events = eventDAO.findByMachineIdAndEndTimeBetween(event.getMachineId(),now,endOfWeek);
 
 		PriorityQueue<Event> priorityQueue = new PriorityQueue<Event>(new EventComparator());
 		priorityQueue.addAll(events);
-		priorityQueue.add(event);
+		if(!event.isCancelled())
+			priorityQueue.add(event);
 
 		Instant nextAvailableAt = null;
 		while(priorityQueue.size()>1) {

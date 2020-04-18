@@ -1,17 +1,19 @@
-package com.iiith.washeteria.businessentities;
+package com.iiith.washeteria.exceptions;
 
-public class ErrorMessage {
+public class ErrorMessage extends Exception{
 	
+	private static final long serialVersionUID = 30091641349553958L;
 	private String errorCode;
 	private String message;
 	
 	public ErrorMessage() {
 	}
 	
-	public ErrorMessage(String errorCode, String message) {
-		this.errorCode = errorCode;
-		this.message = message;
+	public ErrorMessage(ExceptionCodes exCode) {
+		this.errorCode = exCode.getCode();
+		this.message = exCode.getMsg();
 	}
+	
 
 	public String getErrorCode() {
 		return errorCode;

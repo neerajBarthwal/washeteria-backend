@@ -10,6 +10,6 @@ import com.iiith.washeteria.dataentities.Event;
 public interface EventDAO extends JpaRepository<Event, Long> {
 	
 	List<Event> findByModifiedTimeGreaterThanEqualOrderByModifiedTime(Instant modifiedAt);
-	List<Event> findByStartTimeBetween(Instant start, Instant end);
-	List<Event> findByMachineIdAndStartTimeBetween(long machineId, Instant start, Instant end);
+	List<Event> findByEndTimeBetweenOrderByStartTime(Instant start, Instant end);
+	List<Event> findByMachineIdAndEndTimeBetween(long machineId, Instant start, Instant end);
 }

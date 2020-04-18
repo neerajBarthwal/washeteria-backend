@@ -50,7 +50,8 @@ public class EventTranslator {
 			event = new Event();
 			event.setMachineId(eventBE.getMachineId());
 			event.setLocationId(eventBE.getLocationId());
-			
+			if(eventBE.getEventId()>0)
+				event.setEventId(eventBE.getEventId());
 			if(eventBE.getStartsAt()!=0) {
 				Instant startTime = Instant.ofEpochSecond(eventBE.getStartsAt());
 				event.setStartTime(startTime);

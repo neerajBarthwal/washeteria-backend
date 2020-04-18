@@ -29,12 +29,15 @@ public class MachineTranslator {
 		
 		MachineBE machineBE = null;
 		if(machine!=null) {
+			
 			machineBE = new MachineBE();
 			machineBE.setId(machine.getMachineId());
 			machineBE.setLocationId(machine.getLocationId());
 			machineBE.setName(machine.getMachineName());
 			machineBE.setStatus(machine.getStatus());
-			machineBE.setNextAvaiableAt(machine.getAvailableAt().getEpochSecond()); //convert to unix-time(in seconds)
+			
+			if(machine.getAvailableAt()!=null)
+				machineBE.setNextAvaiableAt(machine.getAvailableAt().getEpochSecond()); //convert to unix-time(in seconds)
 		}
 		return machineBE;
 	}
@@ -46,6 +49,8 @@ public class MachineTranslator {
 			machines = new ArrayList<Machine>();
 			for(MachineBE machineBE: machineBEs) {
 				Machine machine = new Machine();
+				if(machineBE.getId()>0)
+					machine.setMachineId(machineBE.getId());
 				machine.setLocationId(machineBE.getLocationId());
 				machine.setMachineName(machineBE.getName());
 				machine.setStatus(machineBE.getStatus());
