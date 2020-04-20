@@ -37,7 +37,7 @@ public class MachineTranslator {
 			machineBE.setStatus(machine.getStatus());
 			
 			if(machine.getAvailableAt()!=null)
-				machineBE.setNextAvaiableAt(machine.getAvailableAt().getEpochSecond()); //convert to unix-time(in seconds)
+				machineBE.setNextAvailableAt(machine.getAvailableAt().getEpochSecond()); //convert to unix-time(in seconds)
 		}
 		return machineBE;
 	}

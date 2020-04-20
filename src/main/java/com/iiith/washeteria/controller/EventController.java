@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.iiith.washeteria.businessentities.AssistedEvent;
 import com.iiith.washeteria.businessentities.EventBE;
 import com.iiith.washeteria.exceptions.ErrorMessage;
 import com.iiith.washeteria.service.EventService;
@@ -48,6 +49,22 @@ public class EventController {
 			return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(errorMessage);
 		}
 		return ResponseEntity.ok().body(createdEvent);
+	}
+	
+	
+	@RequestMapping(value = "/events/assisted",
+					method = RequestMethod.POST,
+					consumes = MediaType.APPLICATION_JSON_VALUE,
+					produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Object> createAssistedEvent(AssistedEvent assistedEvent){
+		
+		EventBE createdEvent = eventService.createAssistedEvent(assistedEvent);
+		
+		if(createdEvent!=null) {
+			return ResponseEntity.ok().body(createdEvent);
+		}
+		
+		return ResponseEntity.ok().body("");
 	}
 
 	@RequestMapping(value = "/events",

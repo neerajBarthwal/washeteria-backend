@@ -6,7 +6,7 @@ public class MachineBE {
 	private String name;
 	private long locationId;
 	private String status;
-	private long nextAvaiableAt;
+	private long nextAvailableAt;
 	
 	public long getId() {
 		return id;
@@ -32,11 +32,11 @@ public class MachineBE {
 	public void setStatus(String status) {
 		this.status = status;
 	}
-	public long getNextAvaiableAt() {
-		return nextAvaiableAt;
+	public long getNextAvailableAt() {
+		return nextAvailableAt;
 	}
-	public void setNextAvaiableAt(long nextAvaiableAt) {
-		this.nextAvaiableAt = nextAvaiableAt;
+	public void setNextAvailableAt(long nextAvailableAt) {
+		this.nextAvailableAt = nextAvailableAt;
 	}
 	
 }
