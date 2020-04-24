@@ -50,21 +50,22 @@ public class EventController {
 		}
 		return ResponseEntity.ok().body(createdEvent);
 	}
-	
-	
+
+
 	@RequestMapping(value = "/events/assisted",
-					method = RequestMethod.POST,
-					consumes = MediaType.APPLICATION_JSON_VALUE,
-					produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Object> createAssistedEvent(AssistedEvent assistedEvent){
-		
-		EventBE createdEvent = eventService.createAssistedEvent(assistedEvent);
-		
-		if(createdEvent!=null) {
-			return ResponseEntity.ok().body(createdEvent);
+			method = RequestMethod.POST,
+			consumes = MediaType.APPLICATION_JSON_VALUE,
+			produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Object> createAssistedEvent(@RequestBody AssistedEvent assistedEvent){
+
+		EventBE createdEvent;
+		try {
+			createdEvent = eventService.createAssistedEvent(assistedEvent);
+		} catch (ErrorMessage errorMessage) {
+			return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(errorMessage);
 		}
-		
-		return ResponseEntity.ok().body("");
+
+		return ResponseEntity.ok().body(createdEvent);
 	}
 
 	@RequestMapping(value = "/events",

@@ -43,7 +43,7 @@ public class MachineServiceImpl implements MachineService {
 	@Override
 	public List<MachineBE> getMachinesAt(long location) {
 		
-		List<Machine> machines = machineDAO.findByLocationId(location);
+		List<Machine> machines = machineDAO.findByLocationIdOrderByAvailableAtDesc(location);
 		List<MachineBE> machineBEs = translate.toBE(machines);
 		return machineBEs;
 	}

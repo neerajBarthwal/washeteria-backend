@@ -7,5 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.iiith.washeteria.dataentities.Machine;
 
 public interface MachineDAO extends JpaRepository<Machine, Long>{
-	List<Machine> findByLocationId(long locationId);
+	List<Machine> findByLocationIdOrderByAvailableAtDesc(long locationId);
 }

@@ -4,20 +4,23 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.Period;
 import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
 import java.util.PriorityQueue;
-import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.iiith.washeteria.businessentities.AssistedEvent;
 import com.iiith.washeteria.businessentities.EventBE;
-import com.iiith.washeteria.businessentities.MachineBE;
+import com.iiith.washeteria.businessentities.Preference;
+import com.iiith.washeteria.businessentities.Slot;
 import com.iiith.washeteria.dao.EventDAO;
+import com.iiith.washeteria.dao.MachineDAO;
 import com.iiith.washeteria.dataentities.Event;
+import com.iiith.washeteria.dataentities.Machine;
 import com.iiith.washeteria.exceptions.ErrorMessage;
 import com.iiith.washeteria.exceptions.ExceptionCodes;
 import com.iiith.washeteria.service.EventService;
@@ -32,6 +35,9 @@ public class EventServiceImpl implements EventService {
 
 	@Autowired
 	private MachineService machineService;
+
+	@Autowired
+	private MachineDAO machineDAO;
 
 	@Autowired
 	private EventTranslator translate;
@@ -74,32 +80,32 @@ public class EventServiceImpl implements EventService {
 		}
 		return createdEvent;
 	}
-	
-//	private boolean isWithinLimit(String userId) {
-//		Instant today = Instant.now();
-//		Instant startOfWeek = today.minus(Period.ofDays(6));
-//		
-//		List<Event> weeklyEventsByUser = eventDAO.
-//				findByUserIdAndEndTimeBetweenOrderByStartTime(userId,startOfWeek, today);
-//		if(weeklyEventsByUser.size()+1>3) // allow only three events per week.
-//			return false;
-//		return true;
-//	}
+
+	//	private boolean isWithinLimit(String userId) {
+	//		Instant today = Instant.now();
+	//		Instant startOfWeek = today.minus(Period.ofDays(6));
+	//		
+	//		List<Event> weeklyEventsByUser = eventDAO.
+	//				findByUserIdAndEndTimeBetweenOrderByStartTime(userId,startOfWeek, today);
+	//		if(weeklyEventsByUser.size()+1>3) // allow only three events per week.
+	//			return false;
+	//		return true;
+	//	}
 
 	private boolean isOverlapping(EventBE newEvent) throws ErrorMessage {
-		
+
 		Instant today = Instant.now();
 		Instant endOfweek = today.plus(Period.ofDays(7));
 		List<Event> existingEvents = eventDAO.
-									 findByMachineIdAndEndTimeBetween(newEvent.getMachineId(),today,endOfweek);
-		
+				findByMachineIdAndEndTimeBetween(newEvent.getMachineId(),today,endOfweek);
+
 		for(Event existingEvent:existingEvents) {
 			Instant startTimeOfNewEvent = Instant.ofEpochSecond(newEvent.getStartsAt());
 			Instant endTimeOfNewEvent = Instant.ofEpochSecond(newEvent.getEndsAt());
-			
+
 			Instant startTime = existingEvent.getStartTime();
 			Instant endTime = existingEvent.getEndTime();
-			
+
 			if(startTimeOfNewEvent.isAfter(startTime) && startTimeOfNewEvent.isBefore(endTime))
 				throw new ErrorMessage(ExceptionCodes.OVERLAPPING_EVENT);
 			else if(endTimeOfNewEvent.isAfter(startTime) && endTimeOfNewEvent.isBefore(endTime))
@@ -107,7 +113,7 @@ public class EventServiceImpl implements EventService {
 		}
 		return false;
 	}
-	
+
 
 	@Override
 	public EventBE updateEvent(EventBE eventBE) {
@@ -155,20 +161,20 @@ public class EventServiceImpl implements EventService {
 		if(!event.isCancelled())
 			priorityQueue.add(event);
 		long timeDifferenceInMinutes = (priorityQueue.peek().getStartTime().getEpochSecond()
-																	-now.getEpochSecond())/60;
+				-now.getEpochSecond())/60;
 		if(timeDifferenceInMinutes>=30)
 			return now;
-		Instant nextAvailableAt = getFistAvailableSlot(priorityQueue);
+		Instant nextAvailableAt = getFistAvailableSlot(priorityQueue,30);
 		return nextAvailableAt;
 	}
 
-	private Instant getFistAvailableSlot(PriorityQueue<Event> priorityQueue) {
+	private Instant getFistAvailableSlot(PriorityQueue<Event> priorityQueue, long durationInMinutes) {
 		Instant nextAvailableAt = null;
 		while(priorityQueue.size()>1) {
 			Event topEvent = priorityQueue.poll();
 			long timeDifferenceInMinutes = (priorityQueue.peek().getStartTime().getEpochSecond()
-											-topEvent.getEndTime().getEpochSecond())/60;
-			if(timeDifferenceInMinutes>=30) {
+					-topEvent.getEndTime().getEpochSecond())/60;
+			if(timeDifferenceInMinutes>=durationInMinutes) {
 				nextAvailableAt = topEvent.getEndTime();
 				break;
 			}
@@ -180,102 +186,172 @@ public class EventServiceImpl implements EventService {
 	}
 
 	@Override
-	public EventBE createAssistedEvent(AssistedEvent assistedEvent) {
-		//boolean isUnderAllowedLimit = isWithinLimit(assistedEvent.getUserId());
-		boolean isAllotedPref = false;
-		Instant startsAt = null;
-		Instant endsAt = null;
-		Set<Long> availableMachines = null;
-		EventBE eventBE = null;
-		if(assistedEvent!=null) {			
-			Set<Long> machines = getMachinesAt(assistedEvent.getLocationId());
-			List<List<Long>> timePreferences = assistedEvent.getPreferences();
-			
-			if(timePreferences!=null) {			
-				for(List<Long> preferredTime: timePreferences) {
-					Set<Long> allMachines = machines;
-					availableMachines = getAvailableMachinesAtPreferredTime(allMachines,preferredTime,assistedEvent.getLocationId());
-					if(!availableMachines.isEmpty()) {
-						isAllotedPref = true;
-						startsAt = Instant.ofEpochSecond(preferredTime.get(0));
-						endsAt = Instant.ofEpochSecond(preferredTime.get(1));
+	public EventBE createAssistedEvent(AssistedEvent assistedEvent) throws ErrorMessage {
+
+		EventBE newEvent = null;
+
+		if(assistedEvent!=null) {
+			// get all the machines at the current location
+			List<Machine> allMachines = machineDAO.findByLocationIdOrderByAvailableAtDesc(assistedEvent.getLocationId());
+			Slot availableSlot = null;
+			if(assistedEvent.getPreferences()!=null && allMachines!=null) {
+				for(Preference preference:assistedEvent.getPreferences()) {
+					//find any available slot at this preferred time
+					availableSlot = getAvailableSlotFor(preference,allMachines,assistedEvent);
+					if(availableSlot!=null)
 						break;
-					}
-					
 				}
-				
+			}
+			if(availableSlot!=null) 
+				newEvent = buildAndCreateEvent(availableSlot, assistedEvent.getLocationId(),assistedEvent.getUserId());
+			else if(assistedEvent.isIgnorePreference() && allMachines!=null && allMachines.size()>0) {
+				newEvent = createDefaultEvent(allMachines,assistedEvent);
 			}
 		}
+
+		return newEvent;
+	}
+	
+	private EventBE createDefaultEvent(List<Machine> allMachines, AssistedEvent assistedEvent) {
+		Machine allotedMachine = allMachines.get(allMachines.size()-1);//sorted in desc order by availableAt.
+		Instant startsAt = allotedMachine.getAvailableAt();
+		Instant endsAt = allotedMachine.getAvailableAt().plusSeconds(assistedEvent.getDuration()*60);
 		
-		if(isAllotedPref) {
-			long machineId = (long)availableMachines.toArray()[0];
-			Event createdEvent = createEventFrom(assistedEvent.getUserId(),
-							assistedEvent.getLocationId(),
-							machineId,
-							startsAt,
-							endsAt);
-			eventBE = translate.toBE(createdEvent);
-		}else if(assistedEvent.isIgnorePreference()) {
-			Event createdEvent = createDefaultEvent(assistedEvent);
-			eventBE = translate.toBE(createdEvent);
-		}
-		
-		return eventBE;
+		Slot defaultSlot = new Slot();
+		defaultSlot.setStartTime(startsAt);
+		defaultSlot.setEndTime(endsAt);
+		defaultSlot.setMachineId(allotedMachine.getMachineId());
+		return buildAndCreateEvent(defaultSlot, assistedEvent.getLocationId(), assistedEvent.getUserId());
 	}
 
-	private Event createDefaultEvent(AssistedEvent assistedEvent) {
-		List<Event> existingEvents = eventDAO.findByLocationId(assistedEvent.getLocationId());
-		PriorityQueue<Event> priorityQueue = new PriorityQueue<Event>(new EventComparator());
-		priorityQueue.addAll(existingEvents);
-		Instant startTime = getFistAvailableSlot(priorityQueue);
-		Instant endTime = startTime.plusSeconds(1800);
-		return createEventFrom(assistedEvent.getUserId(),
-							   assistedEvent.getLocationId(),
-							   1,// machine id TODO: Create builder pattern for EVENT object.
-							   startTime,
-							   endTime);
-		
-		
-	}
-
-	private Event createEventFrom(String userId, long locationId, long machineId, Instant startsAt, Instant endsAt) {
+	private EventBE buildAndCreateEvent(Slot availableSlot, long locationId, String userId) {
 		Event event = new Event();
-		event.setUserId(userId);
-		event.setMachineId(machineId);
+		event.setMachineId(availableSlot.getMachineId());
 		event.setLocationId(locationId);
-		event.setStartTime(startsAt);
-		event.setEndTime(endsAt);
-		return eventDAO.save(event);
+		event.setStartTime(availableSlot.getStartTime());
+		event.setEndTime(availableSlot.getEndTime());
+		event.setModifiedTime(Instant.now());
+		event.setUserId(userId);
+		event = eventDAO.save(event);
+		Instant availableAt = getNextAvailableTime(event);
+		machineService.updateMachineAvailability(event.getMachineId(),availableAt);
+		return translate.toBE(event);
 	}
 
-	private Set<Long> getAvailableMachinesAtPreferredTime(Set<Long> allMachines, List<Long> preferredTime, long locationId) {
-		
-			Instant startTime = Instant.ofEpochSecond(preferredTime.get(0));
-			Instant endTime = Instant.ofEpochSecond(preferredTime.get(1));
-			Set<Long>occupiedMachines = occupiedMachinesBetween(startTime, endTime, locationId);
-			allMachines.removeAll(occupiedMachines);//these are the available machines.
-			return allMachines;			
-	}
+	private Slot getAvailableSlotFor(Preference preference, List<Machine>allMachines, AssistedEvent assistedEvent) {
 
-	private Set<Long> occupiedMachinesBetween(Instant startTime, Instant endTime, long locationId) {
-		List<Event> existingEvents = eventDAO.
-				findByLocationIdAndStartTimeBetweenOrEndTimeBetween(locationId,startTime, endTime,startTime, endTime);
-		Set<Long>occupiedMachines = new HashSet<Long>();
-		for(Event event: existingEvents)
-			occupiedMachines.add(event.getMachineId());
-		return occupiedMachines;
-	}
-
-	private Set<Long> getMachinesAt(long locationId) {
-		List<MachineBE> machines = machineService.getMachinesAt(locationId);
-		Set<Long> allMachines = new HashSet<Long>();
-		for(MachineBE machine: machines) {
-			allMachines.add(machine.getId());
+		List<Slot> slots = new ArrayList<Slot>();
+		Slot allotedSlot = null;
+		Instant preferredStartTime = Instant.ofEpochSecond(preference.getStartTime());
+		Instant preferredEndTime = Instant.ofEpochSecond(preference.getEndTime());
+		for(Machine machine:allMachines) {
+			
+			if(machine.getAvailableAt()==null) {
+				//No event has been set on this machine, therefore user event can be created right away.
+				Slot bestSlot = createSlot(preferredStartTime,assistedEvent.getDuration(),machine.getMachineId());
+				//This candidate slot will also be the most optimal alloted slot.
+				return bestSlot;
+			}else if(machine.getAvailableAt().isBefore(preferredEndTime)) {
+				//Event could be create on this machine, if slot of required duration is available
+				Instant possibleStart = machine.getAvailableAt().isBefore(preferredStartTime)?
+										preferredStartTime:machine.getAvailableAt();
+				Instant startTimeOfSlot = getStartTimeOfFirstAvailableSlot(possibleStart, 
+																	  preferredEndTime,
+																	  machine.getMachineId(),
+																	  assistedEvent);
+				if(startTimeOfSlot!=null){
+					//If no event exists between the possible start and end time,
+					// then, this will serve as one of the candidate slot which can be allocated in future
+					// if no better slot is available
+					Slot candidateSlot = createSlot(startTimeOfSlot,assistedEvent.getDuration(),machine.getMachineId());
+					slots.add(candidateSlot);
+				}
+			}
 		}
-		return allMachines;
+		if(slots.size()>0) {
+			//If there are candidate slots, sort by start time to choose the most optimal.
+			Collections.sort(slots, new Slot.SlotComparator());
+			allotedSlot = slots.get(0);
+		}
+		return allotedSlot;
 	}
+
+	private Slot createSlot(Instant startTimeOfSlot, long duration, long machineId) {
+		Slot slot = new Slot();
+		slot.setStartTime(startTimeOfSlot);
+		slot.setEndTime(startTimeOfSlot.plusSeconds(duration*60));
+		slot.setMachineId(machineId);
+		return slot;
+	}
+
+	private Instant getStartTimeOfFirstAvailableSlot(Instant possibleStart, Instant endTime, long machineId,
+			AssistedEvent assistedEvent) {
+		List<Event> existingEvents = eventDAO.
+									 findByLocationIdAndMachineIdAndEndTimeBetween(assistedEvent.getLocationId(), 
+											 									  machineId, 
+											 									  possibleStart, endTime);
+		
+		if(existingEvents.size()==0)
+			return possibleStart;
+		PriorityQueue<Event> eventsQueue = new PriorityQueue<Event>(new EventComparator());
+		eventsQueue.addAll(existingEvents);
+		long timeDifferenceInMinutes = (eventsQueue.peek().getStartTime().getEpochSecond()
+				-possibleStart.getEpochSecond())/60;
+		if(timeDifferenceInMinutes>=assistedEvent.getDuration())
+			return possibleStart;
+		return getStartTimeOfFirstAvailableSlot(eventsQueue, endTime,assistedEvent.getDuration());
+		
+	}
+
+	private Instant getStartTimeOfFirstAvailableSlot(PriorityQueue<Event> eventsQueue, Instant endTime, long durationInMins) {
+		Instant startTimeOfSlot = null;
+		while(eventsQueue.size()>1) {
+			Event topEvent = eventsQueue.poll();
+			long timeDifferenceInMinutes = (eventsQueue.peek().getStartTime().getEpochSecond()
+					-topEvent.getEndTime().getEpochSecond())/60;
+			if(timeDifferenceInMinutes>=durationInMins) {
+				startTimeOfSlot = topEvent.getEndTime();
+				break;
+			}
+		}
+		if(startTimeOfSlot!=null)
+			return startTimeOfSlot;
+		
+		Event lastEvent = eventsQueue.poll();
+		long timeDifferenceInMinutes = (endTime.getEpochSecond()
+				-lastEvent.getEndTime().getEpochSecond())/60;
+		
+		if(timeDifferenceInMinutes>=durationInMins)
+			 startTimeOfSlot = lastEvent.getEndTime();
+		return startTimeOfSlot;
+	}
+//	public static void main(String[] args) {
+//		Slot s1 = new Slot();
+//		s1.setStartTime(Instant.now());
+//		s1.setEndTime(Instant.now().plusSeconds(1800));
+//		s1.setMachineId(1);
+//
+//		Slot s2 = new Slot();
+//		s2.setStartTime(Instant.now().plusSeconds(1800));
+//		s2.setEndTime(Instant.now().plusSeconds(3600));
+//		s2.setMachineId(2);
+//
+//		Slot s3 = new Slot();
+//		s3.setStartTime(Instant.now().plusSeconds(3600));
+//		s3.setEndTime(Instant.now().plusSeconds(7200));
+//		s3.setMachineId(3);
+//
+//		List<Slot> list = new ArrayList<Slot>();
+//		list.add(s3);list.add(s1);list.add(s2);
+//		Collections.sort(list,new Slot.SlotComparator());
+//
+//		for(Slot slot:list) {
+//			System.out.println(slot.getMachineId() + " "+ slot.getStartTime() + slot.getEndTime());
+//		}
+//	}
 
 }
+
 
 class EventComparator implements Comparator<Event>{
 
@@ -286,5 +362,5 @@ class EventComparator implements Comparator<Event>{
 		else if(firstEvent.getEndTime().isBefore(secondEvent.getEndTime()))
 			return -1;
 		return 0;
-	}	
+	}
 }

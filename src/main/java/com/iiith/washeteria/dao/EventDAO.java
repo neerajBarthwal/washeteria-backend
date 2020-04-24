@@ -15,4 +15,7 @@ public interface EventDAO extends JpaRepository<Event, Long> {
 	List<Event> findByUserIdAndEndTimeBetweenOrderByStartTime(String userId, Instant start, Instant end);
 	List<Event> findByMachineIdAndEndTimeBetween(long machineId, Instant start, Instant end);
 	List<Event> findByLocationId(long locationId);
+	List<Event> findByLocationIdAndMachineIdAndStartTimeBetween(long locationId, long machineId, Instant start, Instant end);
+	List<Event> findByLocationIdAndMachineIdAndEndTimeBetween(long locationId, long machineId, Instant start, Instant end);
+
 }

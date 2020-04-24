@@ -14,6 +14,6 @@ public interface EventService {
 	public void deleteEvent(long eventId);
 	public List<EventBE> getModifiedEvents(long modifiedTime);
 	public List<EventBE> getEvents();
-	public EventBE createAssistedEvent(AssistedEvent assistedEvent);
+	public EventBE createAssistedEvent(AssistedEvent assistedEvent) throws ErrorMessage;
 	
 }

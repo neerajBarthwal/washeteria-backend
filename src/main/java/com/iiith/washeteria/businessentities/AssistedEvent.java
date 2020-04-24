@@ -5,9 +5,9 @@ import java.util.List;
 public class AssistedEvent {
 	
 	private String userId;
-	private long machineId;
 	private long locationId;
-	List<List<Long>> preferences;
+	private List<Preference> preferences;
+	private long duration; // in minutes
 	private boolean ignorePreference;
 	
 	public String getUserId() {
@@ -16,23 +16,24 @@ public class AssistedEvent {
 	public void setUserId(String userId) {
 		this.userId = userId;
 	}
-	public long getMachineId() {
-		return machineId;
-	}
-	public void setMachineId(long machineId) {
-		this.machineId = machineId;
-	}
+	
 	public long getLocationId() {
 		return locationId;
 	}
 	public void setLocationId(long locationId) {
 		this.locationId = locationId;
 	}
-	public List<List<Long>> getPreferences() {
+	public List<Preference> getPreferences() {
 		return preferences;
 	}
-	public void setPreferences(List<List<Long>> preferences) {
+	public void setPreferences(List<Preference> preferences) {
 		this.preferences = preferences;
+	}
+	public long getDuration() {
+		return duration;
+	}
+	public void setDuration(long duration) {
+		this.duration = duration;
 	}
 	public boolean isIgnorePreference() {
 		return ignorePreference;
