@@ -97,7 +97,7 @@ public class EventServiceImpl implements EventService {
 		Instant today = Instant.now();
 		Instant endOfweek = today.plus(Period.ofDays(7));
 		List<Event> existingEvents = eventDAO.
-				findByMachineIdAndEndTimeBetween(newEvent.getMachineId(),today,endOfweek);
+				findByMachineIdAndIsCancelledAndEndTimeBetween(newEvent.getMachineId(),false,today,endOfweek);
 
 		for(Event existingEvent:existingEvents) {
 			Instant startTimeOfNewEvent = Instant.ofEpochSecond(newEvent.getStartsAt());
@@ -158,7 +158,7 @@ public class EventServiceImpl implements EventService {
 		Instant now = LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant();
 		Instant endOfWeek = now.plus(Period.ofDays(7));
 
-		List<Event> events = eventDAO.findByMachineIdAndEndTimeBetween(event.getMachineId(),now,endOfWeek);
+		List<Event> events = eventDAO.findByMachineIdAndIsCancelledAndEndTimeBetween(event.getMachineId(),false,now,endOfWeek);
 
 		PriorityQueue<Event> priorityQueue = new PriorityQueue<Event>(new EventComparator());
 		priorityQueue.addAll(events);
@@ -291,8 +291,9 @@ public class EventServiceImpl implements EventService {
 	private Instant getStartTimeOfFirstAvailableSlot(Instant possibleStart, Instant endTime, long machineId,
 			AssistedEvent assistedEvent) {
 		List<Event> existingEvents = eventDAO.
-									 findByLocationIdAndMachineIdAndEndTimeBetween(assistedEvent.getLocationId(), 
-											 									  machineId, 
+				                     
+				findByLocationIdAndMachineIdAndIsCancelledAndEndTimeBetween(assistedEvent.getLocationId(), 
+											 									  machineId, false,
 											 									  possibleStart, endTime);
 		
 		if(existingEvents.size()==0)
