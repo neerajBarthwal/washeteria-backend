@@ -110,6 +110,10 @@ public class EventServiceImpl implements EventService {
 				throw new ErrorMessage(ExceptionCodes.OVERLAPPING_EVENT);
 			else if(endTimeOfNewEvent.isAfter(startTime) && endTimeOfNewEvent.isBefore(endTime))
 				throw new ErrorMessage(ExceptionCodes.OVERLAPPING_EVENT);
+			else if(startTimeOfNewEvent.isBefore(startTime) && endTimeOfNewEvent.isAfter(endTime))
+				throw new ErrorMessage(ExceptionCodes.OVERLAPPING_EVENT);
+			else if(startTimeOfNewEvent.compareTo(startTime)==0 || endTimeOfNewEvent.compareTo(endTime)==0)
+				throw new ErrorMessage(ExceptionCodes.OVERLAPPING_EVENT);
 		}
 		return false;
 	}

@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import javax.crypto.spec.SecretKeySpec;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.iiith.washeteria.security.UserClaims;
@@ -21,8 +22,10 @@ import io.jsonwebtoken.SignatureException;
 @Service
 public class JwtUtil {
 
-	private static final String ISSUER = "IIIT-HYD-WASHTERERIA-APP";
-	private static final String SECRET_KEY = "My-Hard-Secret-Key";
+	@Autowired
+	private JwtProperties jwtProperties = JwtProperties.getInstance();
+//	private static final String ISSUER ="";
+//	private static final String SECRET_KEY = "";
 	private static final SignatureAlgorithm SIGNATURE_ALGORITHM = io.jsonwebtoken.SignatureAlgorithm.HS256;
 
 
@@ -32,7 +35,7 @@ public class JwtUtil {
 		long nowMillis = System.currentTimeMillis();
 		Date now = new Date(nowMillis);
 
-		byte[] apiKeySecretBytes = SECRET_KEY.getBytes();
+		byte[] apiKeySecretBytes = jwtProperties.getJwtSecretKey().getBytes();
 		Key signingKey = new SecretKeySpec(apiKeySecretBytes, SIGNATURE_ALGORITHM.getJcaName());
 		long expirationOffset = 1000L*60L*500000L;
 		//set claims for JWT
@@ -40,7 +43,7 @@ public class JwtUtil {
 				.setIssuedAt(now)
 				.setSubject("Issued@ "+now.getTime()+" in favour of "+userName)
 				.setAudience(userName)
-				.setIssuer(JwtUtil.ISSUER)
+				.setIssuer(jwtProperties.getJwtIssuer())
 				.setExpiration(new Date(now.getTime()+expirationOffset))
 				.claim("claims", new UserClaims(userName, now.getTime(),"self washeteria/"))
 				.signWith(SIGNATURE_ALGORITHM, signingKey);
@@ -50,7 +53,7 @@ public class JwtUtil {
 
 	public boolean validateToken(String jwt) {
 		try {
-			Claims claims = Jwts.parser().setSigningKey(SECRET_KEY.getBytes())
+			Claims claims = Jwts.parser().setSigningKey(jwtProperties.getJwtSecretKey().getBytes())
 					.parseClaimsJws(jwt).getBody();
 			claims.getAudience();
 
@@ -62,17 +65,4 @@ public class JwtUtil {
 		return true;
 	}
 	
-//	public static void main(String[] args) {
-//		JwtUtil jwtUtil = new JwtUtil();
-//		String token = "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiI1MzMzNTRmNi04MDAxLTRiODQtYWNmYS1mYmVhNWM3NzhjM2QiLCJpYXQiOjE1ODYwMDkyMjUsInN1YiI6Iklzc3VlZEAgMTU4NjAwOTIyNTgxMSBpbiBmYXZvdXIgb2YgbmVlcmFqLmJhcnRod2FsQHN0dWRlbnRzLmlpaXQuYWMuaW4iLCJhdWQiOiJuZWVyYWouYmFydGh3YWxAc3R1ZGVudHMuaWlpdC5hYy5pbiIsImlzcyI6IklJSVQtSFlELVdBU0hURVJFUklBLUFQUCIsImV4cCI6MTU4NjAwOTUyNSwiY2xhaW1zIjp7InVzZXJOYW1lIjoibmVlcmFqLmJhcnRod2FsQHN0dWRlbnRzLmlpaXQuYWMuaW4iLCJ0b2tlbklzc3VlVGltZSI6MTU4NjAwOTIyNTgxMSwic2NvcGUiOiJzZWxmIHdhc2hldGVyaWEvIn19.2iBqPMVChvbUE2WR5g6xc2s1P_g-1FWaaypSuNGXvpw";//jwtUtil.createJWT("neeraj.barthwal@students.iiit.ac.in");
-//		System.out.println(token);
-//		
-//		if(jwtUtil.validateToken(token)) {
-//			System.out.println("VALID!!");
-//		}else {
-//			System.out.println("INVALID");
-//		}
-//	}
-
-
 }
