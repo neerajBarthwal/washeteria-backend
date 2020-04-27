@@ -22,12 +22,6 @@ public class JwtProperties {
     }
 
     private JwtProperties() {
-//        try {
-////            InputStream resourceAsStream = JwtProperties.class.getClassLoader().getResourceAsStream("jwt.properties");
-////            properties.load(resourceAsStream);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
     }
 
     public static JwtProperties getInstance() {

@@ -330,30 +330,6 @@ public class EventServiceImpl implements EventService {
 			 startTimeOfSlot = lastEvent.getEndTime();
 		return startTimeOfSlot;
 	}
-//	public static void main(String[] args) {
-//		Slot s1 = new Slot();
-//		s1.setStartTime(Instant.now());
-//		s1.setEndTime(Instant.now().plusSeconds(1800));
-//		s1.setMachineId(1);
-//
-//		Slot s2 = new Slot();
-//		s2.setStartTime(Instant.now().plusSeconds(1800));
-//		s2.setEndTime(Instant.now().plusSeconds(3600));
-//		s2.setMachineId(2);
-//
-//		Slot s3 = new Slot();
-//		s3.setStartTime(Instant.now().plusSeconds(3600));
-//		s3.setEndTime(Instant.now().plusSeconds(7200));
-//		s3.setMachineId(3);
-//
-//		List<Slot> list = new ArrayList<Slot>();
-//		list.add(s3);list.add(s1);list.add(s2);
-//		Collections.sort(list,new Slot.SlotComparator());
-//
-//		for(Slot slot:list) {
-//			System.out.println(slot.getMachineId() + " "+ slot.getStartTime() + slot.getEndTime());
-//		}
-//	}
 
 }
 

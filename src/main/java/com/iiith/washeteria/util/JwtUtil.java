@@ -24,8 +24,6 @@ public class JwtUtil {
 
 	@Autowired
 	private JwtProperties jwtProperties = JwtProperties.getInstance();
-//	private static final String ISSUER ="";
-//	private static final String SECRET_KEY = "";
 	private static final SignatureAlgorithm SIGNATURE_ALGORITHM = io.jsonwebtoken.SignatureAlgorithm.HS256;
 
 
